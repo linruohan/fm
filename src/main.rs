@@ -9,7 +9,7 @@ use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
 use tracing_tree::HierarchicalLayer;
 
-use fm::AppModel;
+use fm_gtk4::AppModel;
 
 /// A paned file manager with automatic preview.
 #[derive(Parser, Debug)]
@@ -33,7 +33,7 @@ fn main() -> Result<()> {
     gtk::init().unwrap();
 
     relm4::set_global_css(include_str!("styles.css"));
-    let app = RelmApp::new("io.github.fm");
+    let app = RelmApp::new("io.github.fm").with_args(vec![]);
     app.run::<AppModel>(fs::canonicalize(args.file)?);
 
     info!("main loop exited");

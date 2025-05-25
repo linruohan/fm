@@ -1,22 +1,18 @@
 # fm
 
-`fm` is a small, general-purpose file manager built using GTK and [Relm4].
+`fm` 是一个使用GTK和[Relm4]构建的小型通用文件管理器。
 
 ![Screenshot](https://user-images.githubusercontent.com/1372438/164090003-20bca431-e2ef-475a-86d4-df64d10e1989.png)
 
-The directories are visualized using [Miller columns], which enables quick
-navigation throughout the hierarchy.
+目录使用[Miller列]可视化，这使得快速在整个层次结构中导航。
 
-`fm` is in the early stages of development. Manipulating important files with it
-risks data loss.
+`fm` 还处于发展的早期阶段。用它操纵重要文件存在数据丢失的风险。
 
 ## Platform support
 
-Development is currently focused on Linux, but bug reports for other platforms
-are welcome.
+目前的开发主要集中在Linux上，但也有针对其他平台的bug报告是受欢迎的。
 
-The application is known to run successfully on MacOS. Other platforms are
-untested, but if you can get the system dependencies to build, `fm` should work.
+已知该应用程序可以在MacOS上成功运行。其他平台未经测试，但如果您可以获得要构建的系统依赖项，那么‘ fm ’应该可以工作。
 
 ## Hacking
 
@@ -68,3 +64,39 @@ untested, but if you can get the system dependencies to build, `fm` should work.
 [install-libadwaita]: https://gnome.pages.gitlab.gnome.org/libadwaita/
 [install-libpanel]: https://gitlab.gnome.org/chergert/libpanel
 [Relm4]: https://aaronerhardt.github.io/relm4-book/book/
+
+## 编译
+```bash
+# 安装 GTK4 和依赖
+pacman -S mingw-w64-x86_64-gtk4  mingw-w64-x86_64-libadwaita 
+# 安装 gtksourceview-5
+pacman -S mingw-w64-x86_64-gtksourceview5
+# 安装poppler-sys-rs 依赖
+pacman -S mingw-w64-x86_64-poppler
+# 安装libpanel
+pacman -S mingw-w64-x86_64-libpanel
+
+```
+## 编译问题
+1. libpanel-0.5.0/src\auto/functions.rs:48:(.text+0x73fc): undefined reference to `panel_get_resource'␍
+          collect2.exe: error: ld returned 1 exit status
+```bash
+That function is marked as internal.
+$ rg panel_get_resource gtk-build/build/x64/release/libpanel/
+gtk-build/build/x64/release/libpanel/_gvsbuild-meson\src\panel-resources.h
+6:G_GNUC_INTERNAL GResource *panel_get_resource (void);
+
+```
+解决方案：修改为以下代码后清理后重新编译即可
+C:\Users\Administrator\.cargo\registry\src\rsproxy.cn-e3de039b2554c837\libpanel-0.5.0\src\auto\functions.rs
+```rs
+#[doc(alias = "panel_get_resource")]
+#[doc(alias = "get_resource")]
+pub fn resource() -> Option<gio::Resource> {
+    assert_initialized_main_thread!();
+    // unsafe { from_glib_full(ffi::panel_get_resource()) }
+    None
+}
+```
+## 效果图
+[!][image](./assets/01.png)
