@@ -99,4 +99,4 @@ pub fn resource() -> Option<gio::Resource> {
 }
 ```
 ## 效果图
-[!][image](./assets/01.png)
+![image](./assets/01.png)
